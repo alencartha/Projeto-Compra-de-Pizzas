@@ -100,11 +100,23 @@ c('.pizzaInfo--addButton').addEventListener('click', function () {
   let tamanho = parseInt(
     c('.pizzaInfo--size.selected').getAttribute('data-key')
   );
-  carrinho.push({
-    id: pizzaJson[modalKey].id,
-    tamanho,
-    quantidade: modalQuantidade,
+
+  let identificador = pizzaJson[modalKey].id + '@' + tamanho;
+
+  let key = carrinho.findIndex(function (item) {
+    return item.identificador === identificador;
   });
+
+  if (key > -1) {
+    carrinho[key].quantidade += modalQuantidade;
+  } else {
+    carrinho.push({
+      identificador: identificador,
+      id: pizzaJson[modalKey].id,
+      tamanho,
+      quantidade: modalQuantidade,
+    });
+  }
 
   fecharModal();
 });
