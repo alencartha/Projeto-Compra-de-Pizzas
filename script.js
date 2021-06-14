@@ -117,6 +117,85 @@ c('.pizzaInfo--addButton').addEventListener('click', function () {
       quantidade: modalQuantidade,
     });
   }
-
+  atualizarCarrinho();
   fecharModal();
+});
+
+function atualizarCarrinho() {
+  c('.menu-openner span').innerHTML = carrinho.length;
+  let subtotal = 0;
+  let total = 0;
+  let desconto = 0;
+  if (carrinho.length > 0) {
+    c('aside').classList.add('show');
+    c('.cart').innerHTML = '';
+    for (let i in carrinho) {
+      let pizzaItem = pizzaJson.find(function (item) {
+        return item.id == carrinho[i].id;
+      });
+      subtotal += pizzaItem.price * carrinho[i].quantidade;
+
+      let pizzaSizeName;
+      switch (carrinho[i].tamanho) {
+        case 0:
+          pizzaSizeName = 'P';
+          break;
+        case 1:
+          pizzaSizeName = 'M';
+          break;
+        case 2:
+          pizzaSizeName = 'G';
+          break;
+      }
+
+      let pizzaNome = `${pizzaItem.name} (${pizzaSizeName})`;
+
+      let carrinhoItem = c('.models .cart--item').cloneNode(true);
+
+      carrinhoItem.querySelector('.cart--item-nome').innerHTML = pizzaNome;
+      carrinhoItem.querySelector('img').src = pizzaItem.img;
+      carrinhoItem.querySelector('.cart--item--qt').innerHTML =
+        carrinho[i].quantidade;
+
+      carrinhoItem
+        .querySelector('.cart--item-qtmenos')
+        .addEventListener('click', function () {
+          if (carrinho[i].quantidade > 1) {
+            carrinho[i].quantidade--;
+          } else {
+            carrinho.splice(i, 1);
+          }
+          atualizarCarrinho();
+        });
+
+      carrinhoItem
+        .querySelector('.cart--item-qtmais')
+        .addEventListener('click', function () {
+          carrinho[i].quantidade++;
+          atualizarCarrinho();
+        });
+
+      c('.cart').append(carrinhoItem);
+    }
+
+    desconto = subtotal * 0.1;
+    total = subtotal - desconto;
+
+    c('.subtotal span:last-child').innerHTML = `R$ ${subtotal.toFixed(2)}`;
+    c('.desconto span:last-child').innerHTML = `R$ ${desconto.toFixed(2)}`;
+    c('.total span:last-child').innerHTML = `R$ ${total.toFixed(2)}`;
+  } else {
+    c('aside').classList.remove('show');
+    c('aside').style.left = '100vw';
+  }
+}
+
+c('.menu-openner').addEventListener('click', function () {
+  if (carrinho.length > 0) {
+    c('aside').style.left = '0';
+  }
+});
+
+c('.menu-closer').addEventListener('click', function () {
+  c('aside').style.left = '100vw';
 });
